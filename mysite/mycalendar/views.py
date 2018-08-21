@@ -71,7 +71,7 @@ class NewMultiAdd(MonthCalendarMixin, generic.FormView):
             totalkosu = Schedule.objects.filter(date=date).filter(register=str(self.request.user)).first()
             context['totalkosu'] = totalkosu
         except:
-            context['totalkosu'] = 0
+            context['totalkosu'] = 1
         return context
 
     def get_form(self, form_class=None):
