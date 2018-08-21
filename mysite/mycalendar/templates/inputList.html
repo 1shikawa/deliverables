@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
+          integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+
+    <title>一覧</title>
+</head>
+
+<body>
+<div class="col-md-12 main">
+    <h2 class="page-header">入力一覧</h2>
+    <a href="{% url 'mycalendar:sumList' %}">集計一覧</a>
+    <hr>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>年月日</th>
+                <th>大項目</th>
+                <th>工数</th>
+                <th>登録者</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for input in inputList %}
+            <tr>
+                <td>{{ input.date }}</td>
+                <td>{{ input.LargeItem }}</td>
+                <td>{{ input.kosu }}</td>
+                <td>{{ input.register }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% csrf_token %}
+    </div>
+</div>
+</body>
