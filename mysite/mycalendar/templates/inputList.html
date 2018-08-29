@@ -15,7 +15,11 @@
 <body>
 <div class="col-md-12 main">
     <h2 class="page-header">入力一覧</h2>
-    <a href="{% url 'mycalendar:sumList' %}">集計一覧</a>
+    <a href="{% url 'mycalendar:MonthlySumList' %}">集計一覧</a>
+    <form class="form-inline my-2 my-lg-0" method="GET" action="{% url 'mycalendar:inputList' %}">
+        <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" name="keyword">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
     <hr>
     <div class="table-responsive">
         <table class="table table-bordered table-hover">

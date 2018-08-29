@@ -1,3 +1,5 @@
+{% load bootstrap4 %}
+
 <!doctype html>
 <html lang="ja">
 <head>
@@ -29,8 +31,12 @@
       white-space: nowrap;
     }
 
-    #date {
+    .date {
       font-size:22px;
+    }
+
+    .exdate {
+      font-size:18px;
     }
 
     #total {
@@ -44,7 +50,7 @@
     {{ month.current | date:"Y年m月" }}
     <a href="{% url 'mycalendar:month_with_schedule' month.next.year month.next.month %}">次月</a>
     {% if user.is_authenticated %}
-    <span>{{ user.get_username }}でログイン中</span><br>
+    <span>{{ user.groups.all.0 }}：{{ user.username }}でログイン中</span><br>
     {% endif %}
     <a href="{% url 'mycalendar:inputList' %}">入力一覧</a><br>
     <a href="{% url 'logout' %}">ログアウト</a>
@@ -67,15 +73,16 @@
                 {% endif %}
 
                 <div>
-                    <!--当月じゃない日付表示-->
+                    <!--当月じゃない場合の日付表示-->
                     {% if month.current.month != day.month %}
-                    {{ day | date:"m/d" }}
-
-                    {% else%}
-                    <a id="date" href="{% url 'mycalendar:NewMultiAdd' day.year day.month day.day %}">
+                        <span class="exdate">{{ day | date:"m/d" }}</span>
+                    <!--明日以降の日付表示-->
+                    {% elif month.now < day %}
+                        <span class="date">{{ day.day }}</span>
+                    {% else %}
+                        <a class="date" href="{% url 'mycalendar:NewMultiAdd' day.year day.month day.day %}">
                         {{ day.day }}
-                    </a>
-
+                        </a>
                     {% endif %}
 
                     {% for schedule in schedules %}
@@ -90,6 +97,25 @@
         {% endfor %}
         </tbody>
     </table>
+
+{% if messages %}
+{# Django のメッセージに記録している内容があればここで表示 #}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="messages mt-3">
+                {% for message in messages %}
+                <div class="alert alert-dismissable alert-{{ message.tags }}" data-alert="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

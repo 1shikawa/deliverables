@@ -47,7 +47,7 @@ urlpatterns = [
         'inputList/',views.inputList.as_view(), name='inputList'
     ),
     path(
-        'sumList/', views.sumList.as_view(), name='sumList'
+        'MonthlySumList/', views.MonthlySumList.as_view(), name='MonthlySumList'
     ),
 
     # ログアウト

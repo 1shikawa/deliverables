@@ -1,6 +1,6 @@
 <h3>{% block title %}編集{% endblock title %}</h3>
 <h3>{{ indate }}</h3>
-<h4>TOTAL：<span id="total"></span>です。</h4>
+<h4>TOTAL：<span id="total"></span>（分）です。</h4>
 <!doctype html>
 <html lang="ja">
 <head>
@@ -78,19 +78,39 @@
         crossorigin="anonymous"></script>
 
 <script>
+  // 大カテゴリpk: [[カテゴリ1pk, カテゴリ1表示名], [カテゴリ2pk, カテゴリ2表示名]]...のようになります。
+  var category = {
+    {% for li in LargeItem %}
+      {{ li.pk }}: [
+          {% for c in li.middleitem_set.all %}
+            [ {{ c.pk }}, '{{ c.name }}' ],
+          {% endfor %}
+          ],
+    {% endfor %}
+  };
+
+  $(function() {
+      // LargeItemで終わるidのもの、つまり大カテゴリ内を選択したら呼ばれる
+      $('[id$=LargeItem]').on('change', function(){
+          // [カテゴリ1pk, カテゴリ1表示名] を取得する。
+          var categories = category[this.value];
+          var option_element = '';
+          for(c of categories){
+              var pk = c[0];  // カテゴリpk
+              var text = c[1];  // カテゴリ表示名
+              option_element += '<option value=' + pk + ' >' + text + '</option>';
+          }
+          // 大カテゴリselectの親がtd要素なので、parentとし、次のtdの中にあるselectが中カテゴリとなるselect要素です。
+          var small_category_select_element = $(this).parent().next('td').find('select');
+          console.log(small_category_select_element);
+          small_category_select_element.html(option_element);
+      })
+  });
+
 $(function(){
   var current_count = parseInt($('input#id_form-TOTAL_FORMS').val());
   $('button#add').on('click', function(){
-    var element = `<tr><td><select name="form-${current_count}-LargeItem" id="id_form-${current_count}-LargeItem">
-        <option value="" selected>---------</option>
-        <option value="HMK・旧シス対応">HMK・旧シス対応</option>
-        <option value="サービス対応">サービス対応</option>
-        <option value="抽出">抽出</option>
-        <option value="PJT/案件">PJT/案件</option>
-        <option value="運用">運用</option>
-        <option value="障害対応">障害対応</option>
-        <option value="各種資料作成・入力">各種資料作成・入力</option>
-    </select>
+    var element = `<tr><td><input type="text" name="form-${current_count}-LargeItem" maxlength="50" id="id_form-${current_count}-LargeItem" /></td>
     <td><input type="text" name="form-${current_count}-MiddleItem" maxlength="50" id="id_form-${current_count}-MiddleItem" /></td>
     <td><input type="text" name="form-${current_count}-SmallItem" maxlength="50" id="id_form-${current_count}-SmallItem" /></td>
     <td><input type="number" name="form-${current_count}-kosu" value="0" id="id_form-${current_count}-kosu" /></td>

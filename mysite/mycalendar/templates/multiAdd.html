@@ -1,6 +1,6 @@
 <h3>{% block title %}新規登録{% endblock title %}</h3>
 <h3>{{ indate }}</h3>
-<h4>TOTAL：<span id="total"></span>です。</h4>
+<h4>TOTAL：<span id="total"></span>（分）です。</h4>
 <span id="test"></span>
 <!doctype html>
 <head>
@@ -63,6 +63,31 @@
     <a href="{% url 'mycalendar:month_with_schedule' %}" class="btn btn-primary">戻る</a>
     {% csrf_token %}
 </form>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>大項目</th>
+        <th>中項目</th>
+        <th>小項目</th>
+        <th>時間</th>
+        <th>備考</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for reg in registered %}
+    <tr>
+        <td>{{ reg.LargeItem }}</td>
+        <td>{{ reg.MiddleItem }}</td>
+        <td>{{ reg.SmallItem }}</td>
+        <td>{{ reg.kosu }}</td>
+        <td>{{ reg.memo }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+
+</table>
 
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->

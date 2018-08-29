@@ -1,6 +1,7 @@
 import datetime
 from django.utils.decorators import method_decorator # @method_decoratorに使用
 from django.contrib.auth.decorators import login_required # @method_decoratorに使用
+from django.contrib import messages  # メッセージフレームワーク
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
@@ -10,6 +11,7 @@ from .basecalendar import (
     MonthCalendarMixin, MonthWithScheduleMixin
 )
 from django.db.models import Sum
+from dateutil.relativedelta import relativedelta
 import pandas as pd
 
 @method_decorator(login_required, name='dispatch')
@@ -49,7 +51,7 @@ class MonthWithScheduleCalendar(MonthWithScheduleMixin, generic.TemplateView):
 #         schedule.save()
 #         return redirect('mycalendar:month_with_schedule', year=date.year, month=date.month, day=date.day)
 
-# 一括登録
+"""一括登録・登録後表示機能"""
 @method_decorator(login_required, name='dispatch')
 class NewMultiAdd(MonthCalendarMixin, generic.FormView):
     template_name = 'multiAdd.html'
@@ -67,6 +69,7 @@ class NewMultiAdd(MonthCalendarMixin, generic.FormView):
         context['indate'] = indate
         context['month'] = self.get_month_calendar()
         context['LargeItem'] = LargeItem.objects.all()
+        context['registered'] = Schedule.objects.filter(date=date).filter(register=str(self.request.user))
         try:
             totalkosu = Schedule.objects.filter(date=date).filter(register=str(self.request.user)).first()
             context['totalkosu'] = totalkosu
@@ -114,10 +117,12 @@ class NewMultiAdd(MonthCalendarMixin, generic.FormView):
         for row in Schedule.objects.filter(date=date).filter(register=str(self.request.user)):
             row.totalkosu = int(total)
             row.save()
-        return redirect('mycalendar:month_with_schedule', year=date.year, month=date.month, day=date.day)
+        messages.success(self.request, date.strftime('%Y年%m月%d日')+"に新規登録しました。")
+        # return redirect('mycalendar:month_with_schedule', year=date.year, month=date.month, day=date.day)
+        return redirect('mycalendar:NewMultiAdd',year=date.year,month=date.month,day=date.day)
 
 
-# 一括編集
+"""一括編集機能"""
 @method_decorator(login_required, name='dispatch')
 class NewMultiEdit(MonthCalendarMixin, generic.FormView):
     template_name = 'multiEdit.html'
@@ -133,6 +138,7 @@ class NewMultiEdit(MonthCalendarMixin, generic.FormView):
         indate = str(year) + '年' + str(month) + '月' + str(day) + '日'
         context['month'] = self.get_month_calendar()
         context['indate'] = indate
+        context['LargeItem'] = LargeItem.objects.all()
         return context
 
     def get_form(self, form_class=None):
@@ -191,7 +197,7 @@ class NewMultiEdit(MonthCalendarMixin, generic.FormView):
         for row in Schedule.objects.filter(date=date).filter(register=str(self.request.user)):
             row.totalkosu = int(total)
             row.save()
-
+        messages.success(self.request, date.strftime('%Y年%m月%d日') + "を更新しました。")
         return redirect('mycalendar:month_with_schedule', year=date.year, month=date.month, day=date.day)
         # return super().form_valid(form)
 
@@ -248,23 +254,53 @@ class MyCalendar(MonthCalendarMixin, generic.CreateView):
         return redirect('mycalendar', year=date.year, month=date.month, day=date.day)
 
 
+# @method_decorator(login_required, name='dispatch')
+# class inputList(generic.TemplateView):
+#     """入力一覧表示"""
+#     template_name = 'inputList.html'
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['inputList'] = Schedule.objects.all().order_by('date')
+#         return context
+
 @method_decorator(login_required, name='dispatch')
-class inputList(generic.TemplateView):
-    """入力一覧表示"""
+class inputList(generic.ListView):
+    model = Schedule
+    context_object_name = 'inputList'
     template_name = 'inputList.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['inputList'] = Schedule.objects.all().order_by('date')
-        return context
+    def get_queryset(self):
+        queryset = Schedule.objects.all().order_by('date')
+        keyword = self.request.GET.get('keyword')
+        if keyword:
+            queryset = queryset.filter(date__month=keyword)
+        return queryset
 
 
 @method_decorator(login_required, name='dispatch')
-class sumList(generic.TemplateView):
-    """集計一覧表示"""
-    template_name = 'sumList.html'
+class MonthlySumList(generic.ListView):
+    """月次集計一覧表示"""
+    # model = Schedule
+    # context_object_name = 'MonthlySumList'
+    template_name = 'MonthlySumList.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['sumList'] = Schedule.objects.values('date','register').annotate(totalkosu=Sum('kosu')).order_by('date')
+        """外部キーの表示名をidではなく、名前にする→__name"""
+        today = datetime.date.today()
+        first_of_thismonth = today + relativedelta(day=1)
+        # context['MonthlySumList'] = Schedule.objects.select_related().values('date','LargeItem__name','register').annotate(MonthlySum=Sum('kosu')).order_by('register','LargeItem')
+        # context['MonthlySumList'] = Schedule.objects.select_related().filter(date__range=(first_of_thismonth,today)).values('date', 'LargeItem__name','register').annotate(MonthlySum=Sum('kosu')).order_by('register', 'LargeItem')
+        sum_of_thismonth = Schedule.objects.select_related().filter(date__range=(first_of_thismonth, today))
+        s = sum_of_thismonth.values('LargeItem__name','register').annotate(MonthlySum=Sum('kosu')).order_by('register', 'LargeItem')
+        for i in s:
+            context['MonthlySumList'] = i['MonthlySum']
+
+
+
+        # keyword = self.request.GET.get('keyword')
+        # if keyword:
+            # year,month = keyword.split('-')
+            # context['MonthlySumList'] = Schedule.objects.filter(date__year=year).filter(date__month=month).values('date','LargeItem__name', 'register').annotate(MonthlySum=Sum('kosu'))
         return context

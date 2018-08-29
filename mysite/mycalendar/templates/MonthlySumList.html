@@ -16,25 +16,27 @@
 <div class="col-md-12 main">
     <h2 class="page-header">集計一覧</h2>
     <a href="{% url 'mycalendar:inputList' %}">入力一覧</a>
+    <form class="form-inline my-2 my-lg-0" method="GET" action="{% url 'mycalendar:MonthlySumList' %}">
+        <input class="form-control mr-sm-2" type="month" min="2018-06" max="2019-12" aria-label="Search" name="keyword">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
     <hr>
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
             <thead>
             <tr>
-                <th>年月日</th>
+                <!--<th>年月</th>-->
+                <th>大項目</th>
                 <th>工数</th>
                 <th>登録者</th>
             </tr>
             </thead>
             <tbody>
-            {% for sum in sumList %}
+            {% for sum in MonthlySumList %}
             <tr>
-                <td>{{ sum.date }}</td>
-                {% if sum.totalkosu <= 400 %}
-                <td class="table-info">{{ sum.totalkosu }}</td>
-                {% else %}
-                <td>{{ sum.totalkosu }}</td>
-                {% endif %}
+                <!--<td>{{ sum.date.year }}-{{ sum.date.month }}</td>-->
+                <td>{{ sum.LargeItem }}</td>
+                <td>{{ sum.MonthlySum }}</td>
                 <td>{{ sum.register }}</td>
             </tr>
             {% endfor %}
