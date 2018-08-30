@@ -11,6 +11,7 @@ from .basecalendar import (
     MonthCalendarMixin, MonthWithScheduleMixin
 )
 from django.db.models import Sum
+from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 import pandas as pd
 
@@ -105,7 +106,7 @@ class NewMultiAdd(MonthCalendarMixin, generic.FormView):
         instances = form.save(commit=False)
         # 新たに作成されたscheduleと更新されたscheduleを取り出して、新規作成or更新処理
         for schedule in instances:
-            schedule.register = str(self.request.user)
+            schedule.register = str(self.request.user.groups)
             schedule.date = date
             schedule.save()
         # 総時間をkosuを合計してカラムに登録
@@ -281,26 +282,36 @@ class inputList(generic.ListView):
 @method_decorator(login_required, name='dispatch')
 class MonthlySumList(generic.ListView):
     """月次集計一覧表示"""
-    # model = Schedule
-    # context_object_name = 'MonthlySumList'
+    model = Schedule
+    context_object_name = 'MonthlySumList'
     template_name = 'MonthlySumList.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        """外部キーの表示名をidではなく、名前にする→__name"""
-        today = datetime.date.today()
-        first_of_thismonth = today + relativedelta(day=1)
-        # context['MonthlySumList'] = Schedule.objects.select_related().values('date','LargeItem__name','register').annotate(MonthlySum=Sum('kosu')).order_by('register','LargeItem')
-        # context['MonthlySumList'] = Schedule.objects.select_related().filter(date__range=(first_of_thismonth,today)).values('date', 'LargeItem__name','register').annotate(MonthlySum=Sum('kosu')).order_by('register', 'LargeItem')
-        sum_of_thismonth = Schedule.objects.select_related().filter(date__range=(first_of_thismonth, today))
-        s = sum_of_thismonth.values('LargeItem__name','register').annotate(MonthlySum=Sum('kosu')).order_by('register', 'LargeItem')
-        for i in s:
-            context['MonthlySumList'] = i['MonthlySum']
+        keyword = self.request.GET.get('keyword')
 
+        # 年月指定がある場合の処理
+        if keyword:
+            year,month = keyword.split('-')
+            # 指定年月の月初日
+            first_of_month = datetime.date(int(year), int(month), 1)
+            # 指定年月の月末日取得
+            last_of_month = datetime.date(int(year), int(month), 1) + relativedelta(months=1) + timedelta(days=-1)
+            sum_of_month = Schedule.objects.select_related().filter(date__range=(first_of_month, last_of_month))
+            context['MonthlySumList'] = sum_of_month.values('LargeItem__name', 'register').annotate(MonthlySum=Sum('kosu')).order_by('register', 'LargeItem')
+            context['year_month'] = '{}～{}'.format(first_of_month.strftime('%Y年%m月%d日'), last_of_month.strftime('%m月%d日'))
 
+        else:
+            today = datetime.date.today()
+            # 今月初日付を取得
+            first_of_thismonth = today + relativedelta(day=1)
+            # context['MonthlySumList'] = Schedule.objects.select_related().values('date','LargeItem__name','register').annotate(MonthlySum=Sum('kosu')).order_by('register','LargeItem')
+            # context['MonthlySumList'] = Schedule.objects.select_related().filter(date__range=(first_of_thismonth,today)).values('date', 'LargeItem__name','register').annotate(MonthlySum=Sum('kosu')).order_by('register', 'LargeItem')
 
-        # keyword = self.request.GET.get('keyword')
-        # if keyword:
-            # year,month = keyword.split('-')
-            # context['MonthlySumList'] = Schedule.objects.filter(date__year=year).filter(date__month=month).values('date','LargeItem__name', 'register').annotate(MonthlySum=Sum('kosu'))
+            # 今月初から今日までのスケジュールを取得
+            sum_of_thismonth = Schedule.objects.select_related().filter(date__range=(first_of_thismonth, today))
+            # 外部キーの表示名をidではなく、名前にする→属性名__name
+            context['MonthlySumList'] = sum_of_thismonth.values('LargeItem__name', 'register').annotate(
+                MonthlySum=Sum('kosu')).order_by('register', 'LargeItem')
+            context['year_month'] = '{}～{}'.format(first_of_thismonth.strftime('%Y年%m月%d日'),today.strftime('%m月%d日'))
         return context
