@@ -106,7 +106,7 @@ class NewMultiAdd(MonthCalendarMixin, generic.FormView):
         instances = form.save(commit=False)
         # 新たに作成されたscheduleと更新されたscheduleを取り出して、新規作成or更新処理
         for schedule in instances:
-            schedule.register = str(self.request.user.groups)
+            schedule.register = str(self.request.user)
             schedule.date = date
             schedule.save()
         # 総時間をkosuを合計してカラムに登録
@@ -266,17 +266,24 @@ class MyCalendar(MonthCalendarMixin, generic.CreateView):
 #         return context
 
 @method_decorator(login_required, name='dispatch')
-class inputList(generic.ListView):
+class DailyInputList(generic.ListView):
     model = Schedule
-    context_object_name = 'inputList'
-    template_name = 'inputList.html'
+    context_object_name = 'DailyInputList'
+    template_name = 'DailyInputList.html'
 
-    def get_queryset(self):
-        queryset = Schedule.objects.all().order_by('date')
-        keyword = self.request.GET.get('keyword')
-        if keyword:
-            queryset = queryset.filter(date__month=keyword)
-        return queryset
+    def get_context_data(self,**kwargs):
+        context = super().get_context_data(**kwargs)
+        context['DailyInputList'] = Schedule.objects.filter(register=str(self.request.user)).order_by('date')
+        keyword1 = self.request.GET.get('keyword1')
+
+        if keyword1:
+            year, month = keyword1.split('-')
+            # 指定年月の月初日
+            first_of_month = datetime.date(int(year), int(month), 1)
+            # 指定年月の月末日取得
+            last_of_month = datetime.date(int(year), int(month), 1) + relativedelta(months=1) + timedelta(days=-1)
+            context['DailyInputList'] = Schedule.objects.filter(date__range=(first_of_month, last_of_month)).filter(register=str(self.request.user))
+        return context
 
 
 @method_decorator(login_required, name='dispatch')
@@ -288,16 +295,17 @@ class MonthlySumList(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        keyword = self.request.GET.get('keyword')
+        keyword1 = self.request.GET.get('keyword1')
+        keyword2 = self.request.GET.get('keyword2')
 
         # 年月指定がある場合の処理
-        if keyword:
-            year,month = keyword.split('-')
+        if keyword1 or keyword2:
+            year, month = keyword1.split('-')
             # 指定年月の月初日
             first_of_month = datetime.date(int(year), int(month), 1)
             # 指定年月の月末日取得
             last_of_month = datetime.date(int(year), int(month), 1) + relativedelta(months=1) + timedelta(days=-1)
-            sum_of_month = Schedule.objects.select_related().filter(date__range=(first_of_month, last_of_month))
+            sum_of_month = Schedule.objects.select_related().filter(date__range=(first_of_month, last_of_month)).filter(register__contains=keyword2)
             context['MonthlySumList'] = sum_of_month.values('LargeItem__name', 'register').annotate(MonthlySum=Sum('kosu')).order_by('register', 'LargeItem')
             context['year_month'] = '{}～{}'.format(first_of_month.strftime('%Y年%m月%d日'), last_of_month.strftime('%m月%d日'))
 

@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'bookmgr',  # 追記箇所
     'gunicorn', # 追記箇所
     'debug_toolbar', # 追記箇所
-    'mycalendar' # 追記箇所
+    'mycalendar', # 追記箇所
+    'widget_tweaks', # 追記箇所
 ]
 
 MIDDLEWARE = [
@@ -61,7 +62,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, "templates")],# 追記箇所
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -141,7 +142,7 @@ STATIC_ROOT = '/var/www/static'
 # LOGIN_REDIRECT_URL = '/booklist/'  # 追記箇所
 LOGIN_REDIRECT_URL = '/month_with_schedule/'  # 追記箇所
 LOGIN_URL = '/accounts/login/'  # 追記箇所
-LOGOUT_REDIRECT_URL = '/accounts/login/'  # 追記箇所
+LOGOUT_REDIRECT_URL = '/accounts/login'  # 追記箇所
 
 INTERNAL_IPS = ['127.0.0.1','192.168.33.10'] # 追記箇所
 

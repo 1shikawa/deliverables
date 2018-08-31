@@ -44,7 +44,7 @@ urlpatterns = [
     ),
     # 一覧
     path(
-        'inputList/',views.inputList.as_view(), name='inputList'
+        'DailyInputList/', views.DailyInputList.as_view(), name='DailyInputList'
     ),
     path(
         'MonthlySumList/', views.MonthlySumList.as_view(), name='MonthlySumList'

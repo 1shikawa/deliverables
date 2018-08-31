@@ -19,7 +19,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),    # 認証関連有効化
+    path('accounts/', include('django.contrib.auth.urls')),    # 認証関連ビュー有効化
     path('', include('bookmgr.urls', namespace='bookmgr')),
     path('', include('mycalendar.urls', namespace='mycalendar')),
 ]

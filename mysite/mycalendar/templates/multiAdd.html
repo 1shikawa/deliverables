@@ -1,41 +1,43 @@
-<h3>{% block title %}新規登録{% endblock title %}</h3>
-<h3>{{ indate }}</h3>
-<h4>TOTAL：<span id="total"></span>（分）です。</h4>
-<span id="test"></span>
-<!doctype html>
+{% extends 'base.html' %}
 <head>
-    <!-- Required meta tags
-<html lang="ja">-->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
-          integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-
-    <title>カレンダー</title>
+    {% block title %}工数入力{% endblock %}
 </head>
 
+{% block extracss %}
+.indate {
+font-size:20px;
+text-align: center;
+}
+.total {
+font-size:20px;
+text-align: right;
+}
+
+table {
+table-layout: fixed;
+}
+
+.table tr td {
+border: 1px solid #eceeef;
+}
+
+{% endblock %}
+
 <body>
-<style>
-    table {
-        table-layout: fixed;
-    }
+{% block contents %}
+<div>
+    <h4 class="page-header">工数入力</h4>
+    <a class="indate">{{ indate }}</a>
+    <a class="total">TOTAL：<span id="total"></span>（分）です。</a>
+</div>
 
-    .table tr td {
-    border: 1px solid #eceeef;
-    }
-
-
-
-</style>
 <form action="" method="POST">
     {{ form.management_form }}
     <table class="table">
         <thead>
-        <tr>
-            <th>大項目</th>
-            <th>中項目</th>
+        <tr class="table-secondary">
+            <th>大項目（必須）</th>
+            <th>中項目（必須）</th>
             <th>小項目</th>
             <th>時間</th>
             <th>備考</th>
@@ -46,6 +48,8 @@
         {% for fm in form %}
         {{ fm.id }}
         {{ fm.errors }}
+        {{ fm.tag_label }}
+
         <tr>
             <td>{{ fm.LargeItem }}</td>
             <td>{{ fm.MiddleItem }}</td>
@@ -58,15 +62,15 @@
 
     </table>
 
-    <button id="add" type="button" class="btn btn-primary">行追加</button>
+    <button id="add" type="button" class="btn btn-primary" >行追加</button>
     <button type="submit" class="btn btn-primary">送信</button>
     <a href="{% url 'mycalendar:month_with_schedule' %}" class="btn btn-primary">戻る</a>
     {% csrf_token %}
 </form>
-
+<br>
 <table class="table">
     <thead>
-    <tr>
+    <tr class="table-secondary">
         <th>大項目</th>
         <th>中項目</th>
         <th>小項目</th>
@@ -86,22 +90,14 @@
     </tr>
     {% endfor %}
     </tbody>
-
 </table>
 
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
-        integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
-        integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
-        crossorigin="anonymous"></script>
+{% endblock %}
+
+</body>
 
 <script>
+{% block extrajs %}
   // 大カテゴリpk: [[カテゴリ1pk, カテゴリ1表示名], [カテゴリ2pk, カテゴリ2表示名]]...のようになります。
   var category = {
     {% for li in LargeItem %}
@@ -181,7 +177,5 @@ $(document).ready(function(){
     var result = Number({{ totalkosu.totalkosu }});
     $('#total').text(result);
 });
-
-
+{% endblock %}
 </script>
-</body>
