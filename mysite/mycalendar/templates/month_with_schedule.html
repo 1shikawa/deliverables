@@ -47,11 +47,11 @@ font-size:18px;
     </div>
     <table class="table">
         <thead>
-        <tr class="table-secondary">
-            {% for w in month.week_names %}
-            <th>{{ w }}</th>
-            {% endfor %}
-        </tr>
+            <tr class="table-secondary">
+                {% for w in month.week_names %}
+                <th>{{ w }}</th>
+                {% endfor %}
+            </tr>
         </thead>
         <tbody>
         {% for week in month.days %}

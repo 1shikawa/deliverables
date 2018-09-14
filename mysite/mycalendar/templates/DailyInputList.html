@@ -17,6 +17,7 @@ table-layout: fixed;
         <input class="form-control mr-sm-2" type="month" min="2018-06" max="2019-12" aria-label="Search"
                name="keyword1">
         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        <span align="center">{{ InputCountDescription}}：{{ InputCount }}件</span>
     </form>
     <hr>
     <div class="table-sm">
@@ -25,6 +26,8 @@ table-layout: fixed;
             <tr class="table-secondary">
                 <th>年月日</th>
                 <th>大項目</th>
+                <th>中項目</th>
+                <th>小項目</th>
                 <th>工数</th>
                 <th>登録者</th>
             </tr>
@@ -34,6 +37,8 @@ table-layout: fixed;
             <tr>
                 <td>{{ input.date }}</td>
                 <td>{{ input.LargeItem }}</td>
+                <td>{{ input.MiddleItem }}</td>
+                <td>{{ input.SmallItem }}</td>
                 <td>{{ input.kosu }}</td>
                 <td>{{ input.register }}</td>
             </tr>

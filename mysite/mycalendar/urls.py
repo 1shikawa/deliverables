@@ -42,16 +42,32 @@ urlpatterns = [
         'month_with_schedule/NewMultiEdit/<int:year>/<int:month>/<int:day>',
         views.NewMultiEdit.as_view(), name = 'NewMultiEdit'
     ),
-    # 一覧
+    # 入力一覧
     path(
         'DailyInputList/', views.DailyInputList.as_view(), name='DailyInputList'
     ),
+
+    # 日次集計
+    path(
+        'DailySumList/', views.DailySumList.as_view(), name='DailySumList'
+    ),
+
+    # 月次集計
     path(
         'MonthlySumList/', views.MonthlySumList.as_view(), name='MonthlySumList'
     ),
 
+    # チャート
+    path(
+        'Chart/', views.Chart.as_view(), name='Chart'
+    ),
+
     # ログアウト
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
+
+    # パスワード変更
+    path('password_change/', views.PasswordChange.as_view(), name='password_change'),
+    path('password_change/done/', views.PasswordChangeDone.as_view(), name='password_change_done'),
 
 
     path('mycalendar/', views.MyCalendar.as_view(), name='mycalendar'),

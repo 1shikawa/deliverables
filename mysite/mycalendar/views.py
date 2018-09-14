@@ -1,4 +1,9 @@
+import logging
 import datetime
+from django.contrib.auth.views import (
+    LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
+)
+from datetime import timedelta
 from django.utils.decorators import method_decorator # @method_decoratorに使用
 from django.contrib.auth.decorators import login_required # @method_decoratorに使用
 from django.contrib import messages  # メッセージフレームワーク
@@ -6,14 +11,29 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 from mycalendar.models import Schedule,LargeItem
-from .forms import BS4ScheduleForm, BS4ScheduleNewFormSet, BS4ScheduleEditFormSet
+from .forms import BS4ScheduleForm, BS4ScheduleNewFormSet, BS4ScheduleEditFormSet,MyPasswordChangeForm
 from .basecalendar import (
     MonthCalendarMixin, MonthWithScheduleMixin
 )
 from django.db.models import Sum
-from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 import pandas as pd
+
+logger = logging.getLogger(__name__)
+
+@method_decorator(login_required, name='dispatch')
+class PasswordChange(PasswordChangeView):
+    """パスワード変更ビュー"""
+    form_class = MyPasswordChangeForm
+    success_url = reverse_lazy('mycalendar:password_change_done')
+    template_name = 'password_change.html'
+
+
+@method_decorator(login_required, name='dispatch')
+class PasswordChangeDone(PasswordChangeDoneView):
+    """パスワード変更しました"""
+    template_name = 'password_change_done.html'
+
 
 @method_decorator(login_required, name='dispatch')
 class MonthWithScheduleCalendar(MonthWithScheduleMixin, generic.TemplateView):
@@ -24,6 +44,7 @@ class MonthWithScheduleCalendar(MonthWithScheduleMixin, generic.TemplateView):
         context = super().get_context_data(**kwargs)
         """月間カレンダー情報の入った辞書を返す"""
         context['month'] = self.get_month_calendar()
+        logger.info("User:{} got month schecule.".format(str(self.request.user)))
         return context
 
 
@@ -52,9 +73,10 @@ class MonthWithScheduleCalendar(MonthWithScheduleMixin, generic.TemplateView):
 #         schedule.save()
 #         return redirect('mycalendar:month_with_schedule', year=date.year, month=date.month, day=date.day)
 
-"""一括登録・登録後表示機能"""
+
 @method_decorator(login_required, name='dispatch')
 class NewMultiAdd(MonthCalendarMixin, generic.FormView):
+    """一括登録・登録後表示"""
     template_name = 'multiAdd.html'
     # form_class = BS4ScheduleFormSet
     success_url = reverse_lazy('mycalendar:month_with_schedule')
@@ -118,14 +140,17 @@ class NewMultiAdd(MonthCalendarMixin, generic.FormView):
         for row in Schedule.objects.filter(date=date).filter(register=str(self.request.user)):
             row.totalkosu = int(total)
             row.save()
+
+        logger.info("User:{} MultiAdd in {} successfully.".format(str(self.request.user),date))
         messages.success(self.request, date.strftime('%Y年%m月%d日')+"に新規登録しました。")
         # return redirect('mycalendar:month_with_schedule', year=date.year, month=date.month, day=date.day)
         return redirect('mycalendar:NewMultiAdd',year=date.year,month=date.month,day=date.day)
 
 
-"""一括編集機能"""
+
 @method_decorator(login_required, name='dispatch')
 class NewMultiEdit(MonthCalendarMixin, generic.FormView):
+    """一括編集機能"""
     template_name = 'multiEdit.html'
     # form_class = BS4ScheduleFormSet
     success_url = reverse_lazy('mycalendar:month_with_schedule')
@@ -199,6 +224,7 @@ class NewMultiEdit(MonthCalendarMixin, generic.FormView):
             row.totalkosu = int(total)
             row.save()
         messages.success(self.request, date.strftime('%Y年%m月%d日') + "を更新しました。")
+        logger.info("User:{} MultiEdit in {} successfully.".format(str(self.request.user),date))
         return redirect('mycalendar:month_with_schedule', year=date.year, month=date.month, day=date.day)
         # return super().form_valid(form)
 
@@ -267,13 +293,21 @@ class MyCalendar(MonthCalendarMixin, generic.CreateView):
 
 @method_decorator(login_required, name='dispatch')
 class DailyInputList(generic.ListView):
+    """入力一覧"""
     model = Schedule
     context_object_name = 'DailyInputList'
     template_name = 'DailyInputList.html'
 
     def get_context_data(self,**kwargs):
         context = super().get_context_data(**kwargs)
-        context['DailyInputList'] = Schedule.objects.filter(register=str(self.request.user)).order_by('date')
+        # 基準日
+        today = datetime.date.today()
+        # 基準日の31日前を算出
+        before_31_days = today - datetime.timedelta(days=1) * 31
+        # 当日から1ヶ月前までを取得
+        context['DailyInputList'] = Schedule.objects.filter(date__range=(before_31_days,today)).filter(register=str(self.request.user)).order_by('-date')
+        context['InputCount'] = Schedule.objects.filter(date__range=(before_31_days,today)).filter(register=str(self.request.user)).count()
+        context['InputCountDescription'] = '直近1ヶ月'
         keyword1 = self.request.GET.get('keyword1')
 
         if keyword1:
@@ -282,13 +316,35 @@ class DailyInputList(generic.ListView):
             first_of_month = datetime.date(int(year), int(month), 1)
             # 指定年月の月末日取得
             last_of_month = datetime.date(int(year), int(month), 1) + relativedelta(months=1) + timedelta(days=-1)
-            context['DailyInputList'] = Schedule.objects.filter(date__range=(first_of_month, last_of_month)).filter(register=str(self.request.user))
+            context['DailyInputList'] = Schedule.objects.filter(date__range=(first_of_month, last_of_month)).filter(register=str(self.request.user)).order_by('date')
+            context['InputCount'] = Schedule.objects.filter(date__range=(first_of_month, last_of_month)).filter(register=str(self.request.user)).count()
+            context['InputCountDescription'] = '指定年月'
+        logger.info("User:{} DailyInputList successfully.".format(str(self.request.user)))
         return context
+
+
+@method_decorator(login_required,name='dispatch')
+class DailySumList(generic.ListView):
+    """日次集計一覧"""
+    model = Schedule
+    context_object_name = 'DailySumList'
+    template_name = 'DailySumList.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # 基準日
+        today = datetime.date.today()
+        # 基準日の31日前を算出
+        before_31_days = today - datetime.timedelta(days=1) * 31
+        context['DailySumList'] = Schedule.objects.select_related().filter(date__range=(before_31_days,today)).values('date', 'register').annotate(DailySum=Sum('kosu')).order_by('-date')
+        logger.info("User:{} DailySumList successfully.".format(str(self.request.user)))
+        return context
+
 
 
 @method_decorator(login_required, name='dispatch')
 class MonthlySumList(generic.ListView):
-    """月次集計一覧表示"""
+    """月次集計一覧"""
     model = Schedule
     context_object_name = 'MonthlySumList'
     template_name = 'MonthlySumList.html'
@@ -305,8 +361,11 @@ class MonthlySumList(generic.ListView):
             first_of_month = datetime.date(int(year), int(month), 1)
             # 指定年月の月末日取得
             last_of_month = datetime.date(int(year), int(month), 1) + relativedelta(months=1) + timedelta(days=-1)
+            # 月初から月末までのスケジュール取得
             sum_of_month = Schedule.objects.select_related().filter(date__range=(first_of_month, last_of_month)).filter(register__contains=keyword2)
+            # 大項目と登録者ごとに合計工数算出
             context['MonthlySumList'] = sum_of_month.values('LargeItem__name', 'register').annotate(MonthlySum=Sum('kosu')).order_by('register', 'LargeItem')
+            # 指定年月表記
             context['year_month'] = '{}～{}'.format(first_of_month.strftime('%Y年%m月%d日'), last_of_month.strftime('%m月%d日'))
 
         else:
@@ -322,4 +381,14 @@ class MonthlySumList(generic.ListView):
             context['MonthlySumList'] = sum_of_thismonth.values('LargeItem__name', 'register').annotate(
                 MonthlySum=Sum('kosu')).order_by('register', 'LargeItem')
             context['year_month'] = '{}～{}'.format(first_of_thismonth.strftime('%Y年%m月%d日'),today.strftime('%m月%d日'))
+        logger.info("User:{} MonthlySumList successfully.".format(str(self.request.user)))
         return context
+
+
+@method_decorator(login_required, name='dispatch')
+class Chart(generic.ListView):
+    """グラフ＆チャート表示"""
+    model = Schedule
+    context_object_name = 'Chart'
+    template_name = 'Chart.html'
+
