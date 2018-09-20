@@ -13,6 +13,7 @@ margin: 15px auto;
 <body>
 {% block contents %}
 
+
 <div class="container-fluid">
     <h2>PieChart(工事中)</h2>
     <div class="row">
@@ -138,68 +139,68 @@ update_caption(legendItem);
 original.call(this, e, legendItem);
 };
 var myChart = new Chart(ctx, {
-type: 'bar',
-data: {
-labels: ["A", "B", "C", "D", "E"],
-datasets: [{
-label: 'test1',
-backgroundColor: "rgba(91,155,213,1)",
-data: [5, 10, 5, 10, 5],
-}, {
-label: 'test2',
-backgroundColor: "rgba(237,125,49,1)",
-data: [0, 1, 2, 3, 4],
-}, {
-label: 'test3',
-backgroundColor: "rgba(165,165,165,1)",
-data: [10, 2, 5, 11, 12],
-}, {
-label: 'test4',
-backgroundColor: "rgba(255,192,0,1)",
-data: [3, 6, 1, 3, 7],
-}, {
-label: 'test5',
-backgroundColor: "rgba(68,114,196,1)",
-data: [2, 3, 4, 5, 6],
-}, {
-label: 'test6',
-backgroundColor: "rgba(112,173,71,1)",
-data: [1, 5, 3, 2, 4],
-}, {
-label: 'test7',
-backgroundColor: "rgba(37,94,145,1)",
-data: [6, 7, 8, 9, 10],
-}]
-},
-options: {
-title: {
-display: true,
-text: '項目の数（〇〇別）',
-padding:3,
-fontSize: 26
-},
-scales: {
-xAxes: [{
- stacked: true, //積み上げ有効・無効設定
-categoryPercentage:0.8
-}],
-yAxes: [{
- stacked: true, // 積み上げ有効・無効設定
-ticks: {
-stepSize: 2 // ExcelのStep数に合わせる
-}
-}]
-},
-legend: {
-labels: {
-boxWidth:12,
-padding:20
-},
-display: true
-},
-tooltips:{
-mode:'label'
-}
+    type: 'bar',
+    data: {
+        labels: ["A", "B", "C", "D", "E"],
+        datasets: [{
+            label: 'test1',
+            backgroundColor: "rgba(91,155,213,1)",
+            data: [5, 10, 5, 10, 5],
+        }, {
+            label: 'test2',
+            backgroundColor: "rgba(237,125,49,1)",
+            data: [0, 1, 2, 3, 4],
+        }, {
+            label: 'test3',
+            backgroundColor: "rgba(165,165,165,1)",
+            data: [10, 2, 5, 11, 12],
+        }, {
+            label: 'test4',
+            backgroundColor: "rgba(255,192,0,1)",
+            data: [3, 6, 1, 3, 7],
+        }, {
+            label: 'test5',
+            backgroundColor: "rgba(68,114,196,1)",
+            data: [2, 3, 4, 5, 6],
+        }, {
+            label: 'test6',
+            backgroundColor: "rgba(112,173,71,1)",
+            data: [1, 5, 3, 2, 4],
+        }, {
+            label: 'test7',
+            backgroundColor: "rgba(37,94,145,1)",
+            data: [6, 7, 8, 9, 10],
+         }]
+    },
+    options: {
+        title: {
+            display: true,
+            text: '項目の数（〇〇別）',
+            padding:3,
+            fontSize: 26
+        },
+    scales: {
+        xAxes: [{
+        stacked: true, //積み上げ有効・無効設定
+        categoryPercentage:0.8
+        }],
+        yAxes: [{
+        stacked: true, // 積み上げ有効・無効設定
+        ticks: {
+        stepSize: 2 // ExcelのStep数に合わせる
+        }
+        }]
+    },
+    legend: {
+        labels: {
+            boxWidth:12,
+            padding:20
+        },
+        display: true
+    },
+    tooltips:{
+        mode:'label'
+    }
 }
 });
 

@@ -24,7 +24,6 @@
 
 
 
-
 </style>
 
 <body>
@@ -51,9 +50,6 @@
             <li class="nav-item active">
                 <a class="nav-link" href="{% url 'mycalendar:MonthlySumList' %}">月次集計一覧</a>
             </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="{% url 'mycalendar:Chart' %}">Chart</a>
-            </li>
             {% endif%}
             <li>
                 <a class="nav-item nav-link active" href="{% url 'mycalendar:password_change' %}">パスワード変更</a>
@@ -62,7 +58,7 @@
                 <a class="nav-link" href="{% url 'mycalendar:logout' %}">ログアウト</a>
             </li>
         </ul>
-        <span class="navbar-text navbar-right">ログイン中：{{ user.get_username }}</span>
+        <span style="color:white;" class="navbar-text navbar-right">ログイン中：{{ user.get_username }}</span>
         {% endif %}
     </div>
 </nav>
@@ -74,7 +70,6 @@
 <!--{% endif %}-->
 
 <div class="container-fluid">
-
     {% block contents %}
     {% endblock %}
 </div>

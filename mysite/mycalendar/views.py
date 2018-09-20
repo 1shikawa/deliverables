@@ -392,3 +392,20 @@ class Chart(generic.ListView):
     context_object_name = 'Chart'
     template_name = 'Chart.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        columns = ['date', 'LargeItem', 'kosu', 'register']
+        df = pd.DataFrame(columns=columns)
+
+        for i in Schedule.objects.all():
+            se = pd.Series([
+                i.date,
+                i.LargeItem,
+                i.kosu,
+                i.register
+            ], columns)
+            # 1行ずつDataFrameに追加
+            df = df.append(se, ignore_index=True)
+        return context
+
+
