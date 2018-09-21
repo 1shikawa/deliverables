@@ -12,6 +12,28 @@ margin: 15px auto;
 
 <body>
 {% block contents %}
+<div class="table-sm">
+    <table class="table table-bordered table-hover">
+        <thead>
+        <tr class="table-secondary">
+            <th>年月日</th>
+            <th>大項目</th>
+            <th>工数</th>
+            <th>登録者</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for index, row in df.iterrows %}
+        <tr>
+            <td>{{ row.date }}</td>
+            <td>{{ row.LargeItem }}</td>
+            <td>{{ row.kosu }}</td>
+            <td>{{ row.register }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 
 <div class="container-fluid">
@@ -207,6 +229,8 @@ var myChart = new Chart(ctx, {
 
 
 {% endblock %}
+
+
 
 
 

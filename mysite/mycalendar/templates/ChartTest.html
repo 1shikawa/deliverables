@@ -51,3 +51,27 @@ var myChart = new Chart(ctx, {
 </body>
 
 
+<div class="table-sm">
+    <table class="table table-bordered table-hover">
+        <thead>
+        <tr class="table-secondary">
+            <th>年月日</th>
+            <th>名前</th>
+            <th>価格</th>
+            <th>出版社</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for index,row in df.iteritems() %}
+        <tr>
+            <td>{{ row['date'] }}</td>
+            <td>{{ row['LargeItem'] }}</td>
+            <td>{{ row['registar'] }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% csrf_token %}
+</div>
+
+
