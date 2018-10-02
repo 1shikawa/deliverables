@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'debug_toolbar', # 追記箇所
     'mycalendar', # 追記箇所
     'widget_tweaks', # 追記箇所
+    'TopTweetsFinder', # 追記箇所
 ]
 
 MIDDLEWARE = [

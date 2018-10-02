@@ -24,6 +24,7 @@
 
 
 
+
 </style>
 
 <body>
@@ -56,6 +57,9 @@
             </li>
             <li class="nav-item active">
                 <a class="nav-link" href="{% url 'mycalendar:logout' %}">ログアウト</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'TopTweetsFinder:index' %}">index</a>
             </li>
         </ul>
         <span style="color:white;" class="navbar-text navbar-right">ログイン中：{{ user.get_username }}</span>

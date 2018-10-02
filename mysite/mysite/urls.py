@@ -22,6 +22,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),    # 認証関連ビュー有効化
     path('', include('bookmgr.urls', namespace='bookmgr')),
     path('', include('mycalendar.urls', namespace='mycalendar')),
+    path('', include('TopTweetsFinder.urls', namespace='TopTweetsFinder')),
 ]
 
 

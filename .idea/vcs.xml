@@ -3,6 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/akiyoko-sample" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/instant-django" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/stocksPrice" vcs="Git" />
   </component>
 </project>

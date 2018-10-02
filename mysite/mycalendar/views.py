@@ -406,6 +406,7 @@ class Chart(generic.ListView):
             ], columns)
             # 1行ずつDataFrameに追加
             df = df.append(se, ignore_index=True)
+        df = df.groupby('LargeItem').sum('kosu')
         # 辞書にDateFrameオブジェクト追加
         context['df'] = df
         return context
