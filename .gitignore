@@ -177,3 +177,4 @@ mysqltest.py
 /mysite/bookmgr/
 /mysite/TopTweetsFinder/
 /instant-django/
+/.rbenv/plugins/ruby-build/
