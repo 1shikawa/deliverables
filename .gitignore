@@ -176,3 +176,4 @@ heikin_oracle_v20.py
 mysqltest.py
 /mysite/bookmgr/
 /mysite/TopTweetsFinder/
+/instant-django/
