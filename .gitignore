@@ -160,18 +160,8 @@ venv.bak/
 
 Would skip repository .rbenv/plugins/ruby-build
 Would skip repository instant-django/
-mysite/TopTweetsFinder/__init__.py
-mysite/TopTweetsFinder/admin.py
-mysite/TopTweetsFinder/apps.py
-mysite/TopTweetsFinder/migrations/
-mysite/TopTweetsFinder/models.py
-mysite/TopTweetsFinder/tests.py
-mysite/TopTweetsFinder/views.py
 mysite/mycalendar/migrations/0024_auto_20181002_1642.py
 phantomjs-2.1.1-linux-x86_64/
-scraping/img/2018_07_27/
-scraping/note_list.csv
-twitterAPI/main.sh
 .idea
 PyQ_webdev
 akiyoko-sample
@@ -184,3 +174,5 @@ twitterAPI
 .heikin_oracle_v20.py.swp
 heikin_oracle_v20.py
 mysqltest.py
+/mysite/bookmgr/
+/mysite/TopTweetsFinder/
