@@ -1,6 +1,7 @@
 import datetime
 from django.db import models
 from django.utils import timezone
+from django.core.validators import RegexValidator, slug_re
 
 class LargeItem(models.Model):
     name = models.CharField(verbose_name='大項目', max_length=255)
@@ -39,7 +40,11 @@ class Schedule(models.Model):
     start_time = models.TimeField('開始時間', default=datetime.time(7, 0, 0))
     end_time = models.TimeField('終了時間', default=datetime.time(7, 0, 0))
     date = models.DateField('日付')
-    kosu = models.PositiveIntegerField('時間（分）', blank=True, default=0)
+    kosu = models.PositiveIntegerField('時間（分）', blank=True, default=0,validators=[RegexValidator(
+        slug_re,
+        '時間（分）には半角英数字のみ指定できます。',
+        'invalid'
+    )])
     # kosu = models.CharField('時間', max_length=50,blank=True)
     totalkosu = models.PositiveIntegerField('総時間（分）', blank=True, default=0)
     register = models.CharField('登録者', max_length=50)
