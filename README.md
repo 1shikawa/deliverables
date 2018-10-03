@@ -1,4 +1,4 @@
-# mysite-mycalendar 作業工数管理システム
+# mysite-mycalendar 作業工数管理Webアプリ
 
 # 開発環境
 OS：Ubuntu 16.04 LTS (64b)\
