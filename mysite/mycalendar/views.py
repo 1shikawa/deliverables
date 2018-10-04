@@ -4,14 +4,14 @@ from django.contrib.auth.views import (
     LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
 )
 from datetime import timedelta
-from django.utils.decorators import method_decorator # @method_decoratorに使用
-from django.contrib.auth.decorators import login_required # @method_decoratorに使用
+from django.utils.decorators import method_decorator  # @method_decoratorに使用
+from django.contrib.auth.decorators import login_required  # @method_decoratorに使用
 from django.contrib import messages  # メッセージフレームワーク
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
-from mycalendar.models import Schedule,LargeItem
-from .forms import BS4ScheduleForm, BS4ScheduleNewFormSet, BS4ScheduleEditFormSet,MyPasswordChangeForm
+from mycalendar.models import Schedule, LargeItem
+from .forms import BS4ScheduleForm, BS4ScheduleNewFormSet, BS4ScheduleEditFormSet, MyPasswordChangeForm
 from .basecalendar import (
     MonthCalendarMixin, MonthWithScheduleMixin
 )
@@ -20,6 +20,7 @@ from dateutil.relativedelta import relativedelta
 import pandas as pd
 
 logger = logging.getLogger(__name__)
+
 
 @method_decorator(login_required, name='dispatch')
 class PasswordChange(PasswordChangeView):
@@ -141,11 +142,10 @@ class NewMultiAdd(MonthCalendarMixin, generic.FormView):
             row.totalkosu = int(total)
             row.save()
 
-        logger.info("User:{} MultiAdd in {} successfully.".format(str(self.request.user),date))
-        messages.success(self.request, date.strftime('%Y年%m月%d日')+"に新規登録しました。")
+        logger.info("User:{} MultiAdd in {} successfully.".format(str(self.request.user), date))
+        messages.success(self.request, date.strftime('%Y年%m月%d日') + "に新規登録しました。")
         # return redirect('mycalendar:month_with_schedule', year=date.year, month=date.month, day=date.day)
-        return redirect('mycalendar:NewMultiAdd',year=date.year,month=date.month,day=date.day)
-
+        return redirect('mycalendar:NewMultiAdd', year=date.year, month=date.month, day=date.day)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -174,7 +174,7 @@ class NewMultiEdit(MonthCalendarMixin, generic.FormView):
         if month and year and day:
             date = str(year) + '-' + str(month) + '-' + str(day)
         return BS4ScheduleEditFormSet(self.request.POST or None,
-                                      queryset=Schedule.objects.filter(date=date,register=self.request.user))
+                                      queryset=Schedule.objects.filter(date=date, register=self.request.user))
         # ,register=self.request.user))
 
     # def form_valid(self, form):
@@ -215,7 +215,7 @@ class NewMultiEdit(MonthCalendarMixin, generic.FormView):
             schedule.date = date
             schedule.save()
 
-        kosuBydate = Schedule.objects.filter(date=date).values('date','register').annotate(totalkosu=Sum('kosu'))
+        kosuBydate = Schedule.objects.filter(date=date).values('date', 'register').annotate(totalkosu=Sum('kosu'))
         for i in kosuBydate:
             if i['register'] == str(self.request.user):
                 total = i['totalkosu']
@@ -224,7 +224,7 @@ class NewMultiEdit(MonthCalendarMixin, generic.FormView):
             row.totalkosu = int(total)
             row.save()
         messages.success(self.request, date.strftime('%Y年%m月%d日') + "を更新しました。")
-        logger.info("User:{} MultiEdit in {} successfully.".format(str(self.request.user),date))
+        logger.info("User:{} MultiEdit in {} successfully.".format(str(self.request.user), date))
         return redirect('mycalendar:month_with_schedule', year=date.year, month=date.month, day=date.day)
         # return super().form_valid(form)
 
@@ -298,15 +298,17 @@ class DailyInputList(generic.ListView):
     context_object_name = 'DailyInputList'
     template_name = 'DailyInputList.html'
 
-    def get_context_data(self,**kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # 基準日
         today = datetime.date.today()
         # 基準日の31日前を算出
         before_31_days = today - datetime.timedelta(days=1) * 31
         # 当日から1ヶ月前までを取得
-        context['DailyInputList'] = Schedule.objects.filter(date__range=(before_31_days,today)).filter(register=str(self.request.user)).order_by('-date')
-        context['InputCount'] = Schedule.objects.filter(date__range=(before_31_days,today)).filter(register=str(self.request.user)).count()
+        context['DailyInputList'] = Schedule.objects.filter(date__range=(before_31_days, today)).filter(
+            register=str(self.request.user)).order_by('-date')
+        context['InputCount'] = Schedule.objects.filter(date__range=(before_31_days, today)).filter(
+            register=str(self.request.user)).count()
         context['InputCountDescription'] = '直近1ヶ月'
         keyword1 = self.request.GET.get('keyword1')
 
@@ -316,14 +318,16 @@ class DailyInputList(generic.ListView):
             first_of_month = datetime.date(int(year), int(month), 1)
             # 指定年月の月末日取得
             last_of_month = datetime.date(int(year), int(month), 1) + relativedelta(months=1) + timedelta(days=-1)
-            context['DailyInputList'] = Schedule.objects.filter(date__range=(first_of_month, last_of_month)).filter(register=str(self.request.user)).order_by('date')
-            context['InputCount'] = Schedule.objects.filter(date__range=(first_of_month, last_of_month)).filter(register=str(self.request.user)).count()
+            context['DailyInputList'] = Schedule.objects.filter(date__range=(first_of_month, last_of_month)).filter(
+                register=str(self.request.user)).order_by('date')
+            context['InputCount'] = Schedule.objects.filter(date__range=(first_of_month, last_of_month)).filter(
+                register=str(self.request.user)).count()
             context['InputCountDescription'] = '指定年月'
         logger.info("User:{} DailyInputList successfully.".format(str(self.request.user)))
         return context
 
 
-@method_decorator(login_required,name='dispatch')
+@method_decorator(login_required, name='dispatch')
 class DailySumList(generic.ListView):
     """日次集計一覧"""
     model = Schedule
@@ -336,10 +340,10 @@ class DailySumList(generic.ListView):
         today = datetime.date.today()
         # 基準日の31日前を算出
         before_31_days = today - datetime.timedelta(days=1) * 31
-        context['DailySumList'] = Schedule.objects.select_related().filter(date__range=(before_31_days,today)).values('date', 'register').annotate(DailySum=Sum('kosu')).order_by('-date')
+        context['DailySumList'] = Schedule.objects.select_related().filter(date__range=(before_31_days, today)).values(
+            'date', 'register').annotate(DailySum=Sum('kosu')).order_by('-date')
         logger.info("User:{} DailySumList successfully.".format(str(self.request.user)))
         return context
-
 
 
 @method_decorator(login_required, name='dispatch')
@@ -355,6 +359,7 @@ class MonthlySumList(generic.ListView):
         keyword2 = self.request.GET.get('keyword2')
 
         # 年月指定がある場合の処理
+
         if keyword1 or keyword2:
             year, month = keyword1.split('-')
             # 指定年月の月初日
@@ -362,11 +367,14 @@ class MonthlySumList(generic.ListView):
             # 指定年月の月末日取得
             last_of_month = datetime.date(int(year), int(month), 1) + relativedelta(months=1) + timedelta(days=-1)
             # 月初から月末までのスケジュール取得
-            sum_of_month = Schedule.objects.select_related().filter(date__range=(first_of_month, last_of_month)).filter(register__contains=keyword2)
+            sum_of_month = Schedule.objects.select_related().filter(
+                date__range=(first_of_month, last_of_month)).filter(register__contains=keyword2)
             # 大項目と登録者ごとに合計工数算出
-            context['MonthlySumList'] = sum_of_month.values('LargeItem__name', 'register').annotate(MonthlySum=Sum('kosu')).order_by('register', 'LargeItem')
+            context['MonthlySumList'] = sum_of_month.values('LargeItem__name', 'register').annotate(
+                MonthlySum=Sum('kosu')).order_by('register', 'LargeItem')
             # 指定年月表記
-            context['year_month'] = '{}～{}'.format(first_of_month.strftime('%Y年%m月%d日'), last_of_month.strftime('%m月%d日'))
+            context['year_month'] = '{}～{}'.format(first_of_month.strftime('%Y年%m月%d日'),
+                                                   last_of_month.strftime('%m月%d日'))
 
         else:
             today = datetime.date.today()
@@ -380,7 +388,9 @@ class MonthlySumList(generic.ListView):
             # 外部キーの表示名をidではなく、名前にする→属性名__name
             context['MonthlySumList'] = sum_of_thismonth.values('LargeItem__name', 'register').annotate(
                 MonthlySum=Sum('kosu')).order_by('register', 'LargeItem')
-            context['year_month'] = '{}～{}'.format(first_of_thismonth.strftime('%Y年%m月%d日'),today.strftime('%m月%d日'))
+            context['year_month'] = '{}～{}'.format(first_of_thismonth.strftime('%Y年%m月%d日'),
+                                                   today.strftime('%m月%d日'))
+
         logger.info("User:{} MonthlySumList successfully.".format(str(self.request.user)))
         return context
 
@@ -396,19 +406,24 @@ class Chart(generic.ListView):
         context = super().get_context_data(**kwargs)
         columns = ['date', 'LargeItem', 'kosu', 'register']
         df = pd.DataFrame(columns=columns)
+        # LargeItemをラベル変換するための対応付けmap
+        mapped = {1: 'HMK・旧シス対応', 2: 'サービス対応', 3: '抽出', 4: 'PJT/案件',
+                  5: '運用', 6: '障害対応', 7: '各種資料作成・入力'}
 
-        for i in Schedule.objects.all():
+        for i in Schedule.objects.select_related():
             se = pd.Series([
                 i.date,
-                i.LargeItem,
+                i.LargeItem_id,
                 i.kosu,
                 i.register
             ], columns)
             # 1行ずつDataFrameに追加
             df = df.append(se, ignore_index=True)
-        df = df.groupby('LargeItem').sum('kosu')
+
+        # LargeItemとregisterでグループ化してkosuを合計(groupオブジェクト)→DataFrameオブジェクト化
+        groupdf = df.groupby(['LargeItem', 'register'])['kosu'].sum().reset_index()
+        # LargeItemをmappedでラベル変換
+        groupdf['LargeItemLabel'] = groupdf['LargeItem'].map(mapped)
         # 辞書にDateFrameオブジェクト追加
-        context['df'] = df
+        context['df'] = groupdf
         return context
-
-

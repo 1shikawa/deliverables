@@ -16,7 +16,7 @@ margin: 15px auto;
     <table class="table table-bordered table-hover">
         <thead>
         <tr class="table-secondary">
-            <th>年月日</th>
+
             <th>大項目</th>
             <th>工数</th>
             <th>登録者</th>
@@ -25,8 +25,8 @@ margin: 15px auto;
         <tbody>
         {% for index, row in df.iterrows %}
         <tr>
-            <td>{{ row.date }}</td>
-            <td>{{ row.LargeItem }}</td>
+
+            <td>{{ row.LargeItemLabel }}</td>
             <td>{{ row.kosu }}</td>
             <td>{{ row.register }}</td>
         </tr>
