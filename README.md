@@ -14,5 +14,6 @@ IDE：Pycharm 20188.2.2(Community Edition)
 ![2](https://user-images.githubusercontent.com/40058717/45882444-29232980-bde9-11e8-81b6-405812823c00.png)
 
 # ■画面遷移
-
+aa
 # ■画面一覧
+aa
