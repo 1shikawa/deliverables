@@ -48,5 +48,9 @@ table-layout: fixed;
         {% csrf_token %}
     </div>
 </div>
+
+{# ページネーション機能をインクルード #}
+{% include 'includes/pagination.html' %}
+
 {% endblock %}
 </body>

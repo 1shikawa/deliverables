@@ -2,14 +2,23 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from django.core.validators import RegexValidator, slug_re
+from django.contrib.auth.models import AbstractUser
+
+
+# class User(AbstractUser):
+#     """カスタムユーザー"""
+#     email = models.EmailField(_('email address'), unique=True)
+
 
 class LargeItem(models.Model):
+    """大項目"""
     name = models.CharField(verbose_name='大項目', max_length=255)
 
     def __str__(self):
         return self.name
 
 class MiddleItem(models.Model):
+    """中項目"""
     name = models.CharField(verbose_name='中項目', max_length=255)
     parent = models.ForeignKey(LargeItem, verbose_name='大項目', on_delete=models.PROTECT)
 

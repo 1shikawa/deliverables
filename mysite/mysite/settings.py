@@ -140,6 +140,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/static'
 
+# AUTH_USER_MODEL = 'mycalendar.User' # 追記箇所
+
 # LOGIN_REDIRECT_URL = '/booklist/'  # 追記箇所
 LOGIN_REDIRECT_URL = '/month_with_schedule/'  # 追記箇所
 LOGIN_URL = '/accounts/login/'  # 追記箇所

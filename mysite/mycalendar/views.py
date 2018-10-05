@@ -297,6 +297,7 @@ class DailyInputList(generic.ListView):
     model = Schedule
     context_object_name = 'DailyInputList'
     template_name = 'DailyInputList.html'
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -325,6 +326,10 @@ class DailyInputList(generic.ListView):
             context['InputCountDescription'] = '指定年月'
         logger.info("User:{} DailyInputList successfully.".format(str(self.request.user)))
         return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(register=self.request.user)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -421,9 +426,12 @@ class Chart(generic.ListView):
             df = df.append(se, ignore_index=True)
 
         # LargeItemとregisterでグループ化してkosuを合計(groupオブジェクト)→DataFrameオブジェクト化
-        groupdf = df.groupby(['LargeItem', 'register'])['kosu'].sum().reset_index()
+        grouped_df = df.groupby(['LargeItem', 'register'])['kosu'].sum().reset_index()
         # LargeItemをmappedでラベル変換
-        groupdf['LargeItemLabel'] = groupdf['LargeItem'].map(mapped)
+        grouped_df['LargeItemLabel'] = grouped_df['LargeItem'].map(mapped)
+        # 登録者、大項目で昇順ソート
+        sorted_grouped_df = grouped_df.sort_values(by=["register", 'LargeItem'], ascending=True)
         # 辞書にDateFrameオブジェクト追加
-        context['df'] = groupdf
+        context['df'] = sorted_grouped_df
+        context['register'] = sorted_grouped_df['register'].drop_duplicates().reset_index()
         return context

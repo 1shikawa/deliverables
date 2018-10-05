@@ -27,7 +27,7 @@ margin: 15px auto;
         <tr>
 
             <td>{{ row.LargeItemLabel }}</td>
-            <td>{{ row.kosu }}</td>
+            <td>{{ row.kosu }} </td>
             <td>{{ row.register }}</td>
         </tr>
         {% endfor %}
@@ -76,7 +76,11 @@ var ctx = document.getElementById("PieChart1").getContext('2d');
 var myChart = new Chart(ctx, {
   type: 'pie',
   data: {
-    labels: ["test1", "test2", "test3", "test4", "test5", "test6", "test7"],
+    labels: [{% for index, row in df.iterrows %}
+          {% if row.register == 'admin' %}
+            '{{ row.LargeItemLabel }}',
+            {% endif %}
+         {% endfor %}],
     datasets: [{
       backgroundColor: [
         "#2ecc71",
@@ -87,16 +91,32 @@ var myChart = new Chart(ctx, {
         "#e74c3c",
         "#34495e"
       ],
-      data: [12, 19, 3, 17, 28, 24, 7]
+      data: [{% for index, row in df.iterrows %}
+          {% if row.register == 'admin' %}
+            {{ row.kosu }},
+            {% endif %}
+         {% endfor %}],
     }]
-  }
+  },
+  options: {
+        title: {
+            display: true,
+            position: 'bottom',
+            fontSize:15,
+            text: 'admin'
+        }
+    }
 });
 
 var ctx = document.getElementById("PieChart2").getContext('2d');
 var myChart = new Chart(ctx, {
   type: 'pie',
   data: {
-    labels: ["test1", "test2", "test3", "test4", "test5", "test6", "test7"],
+    labels: [{% for index, row in df.iterrows %}
+          {% if row.register == 'ishikawa' %}
+            '{{ row.LargeItemLabel }}',
+            {% endif %}
+         {% endfor %}],
     datasets: [{
       backgroundColor: [
         "#2ecc71",
@@ -107,16 +127,33 @@ var myChart = new Chart(ctx, {
         "#e74c3c",
         "#34495e"
       ],
-      data: [12, 19, 3, 17, 28, 24, 7]
+      data: [{% for index, row in df.iterrows %}
+          {% if row.register == 'ishikawa' %}
+            {{ row.kosu }},
+            {% endif %}
+         {% endfor %}],
     }]
-  }
+  },
+  options: {
+        title: {
+            display: true,
+            position: 'bottom',
+            fontSize:15,
+            text: 'ishikawa'
+        }
+    }
 });
+
 
 var ctx = document.getElementById("PieChart3").getContext('2d');
 var myChart = new Chart(ctx, {
   type: 'pie',
   data: {
-    labels: ["test1", "test2", "test3", "test4", "test5", "test6", "test7"],
+    labels: [{% for index, row in df.iterrows %}
+          {% if row.register == 'fujikawa' %}
+            '{{ row.LargeItemLabel }}',
+            {% endif %}
+         {% endfor %}],
     datasets: [{
       backgroundColor: [
         "#2ecc71",
@@ -127,9 +164,21 @@ var myChart = new Chart(ctx, {
         "#e74c3c",
         "#34495e"
       ],
-      data: [12, 19, 3, 17, 28, 24, 7]
+      data: [{% for index, row in df.iterrows %}
+          {% if row.register == 'fujikawa' %}
+            {{ row.kosu }},
+            {% endif %}
+         {% endfor %}],
     }]
-  }
+  },
+  options: {
+        title: {
+            display: true,
+            position: 'bottom',
+            fontSize:15,
+            text: 'fujikawa'
+        }
+    }
 });
 
 
@@ -163,35 +212,72 @@ original.call(this, e, legendItem);
 var myChart = new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: ["A", "B", "C", "D", "E"],
+        labels: [{% for index, row in register.iterrows %}
+            '{{ row.register }}',
+            {% endfor %}                    ],
+
         datasets: [{
             label: 'test1',
             backgroundColor: "rgba(91,155,213,1)",
-            data: [5, 10, 5, 10, 5],
-        }, {
+            data: [{% for index, row in df.iterrows %}
+                {% if row.LargeItem == 1%}
+                '{{ row.kosu }}',
+                {% endif %}
+                {% endfor %}        ],
+        },
+        {
             label: 'test2',
             backgroundColor: "rgba(237,125,49,1)",
-            data: [0, 1, 2, 3, 4],
-        }, {
+            data: [{% for index, row in df.iterrows %}
+                {% if row.LargeItem == 2%}
+                '{{ row.kosu }}',
+                {% endif %}
+                {% endfor %}        ],
+        },
+        {
             label: 'test3',
             backgroundColor: "rgba(165,165,165,1)",
-            data: [10, 2, 5, 11, 12],
-        }, {
+            data: [{% for index, row in df.iterrows %}
+                {% if row.LargeItem == 3%}
+                '{{ row.kosu }}',
+                {% endif %}
+                {% endfor %}        ],
+        },
+        {
             label: 'test4',
             backgroundColor: "rgba(255,192,0,1)",
-            data: [3, 6, 1, 3, 7],
-        }, {
+            data: [{% for index, row in df.iterrows %}
+                {% if row.LargeItem == 4%}
+                '{{ row.kosu }}',
+                {% endif %}
+                {% endfor %}        ],
+        },
+        {
             label: 'test5',
             backgroundColor: "rgba(68,114,196,1)",
-            data: [2, 3, 4, 5, 6],
-        }, {
+            data: [{% for index, row in df.iterrows %}
+                {% if row.LargeItem == 5 %}
+                '{{ row.kosu }}',
+                {% endif %}
+                {% endfor %}        ],
+        },
+        {
             label: 'test6',
             backgroundColor: "rgba(112,173,71,1)",
-            data: [1, 5, 3, 2, 4],
-        }, {
+            data: [{% for index, row in df.iterrows %}
+                {% if row.LargeItem == 6%}
+                '{{ row.kosu }}',
+                {% endif %}
+                {% endfor %}        ],
+        },
+        {
             label: 'test7',
             backgroundColor: "rgba(37,94,145,1)",
-            data: [6, 7, 8, 9, 10],
+            data: [{% for index, row in df.iterrows %}
+                {% if row.LargeItem == 7%}
+                '{{ row.kosu }}',
+                {% endif %}
+                {% endfor %}        ],
          }]
     },
     options: {

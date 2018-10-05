@@ -9,7 +9,7 @@ CSSフレームワーク：Bootstrap4 0.0.6\
 Webサーバ：Nginx 1.14.0\
 APサーバ：Gunicorn 19.9.0\
 DBサーバ：MariaDB 10.0.36\
-IDE：Pycharm 20188.2.2(Community Edition)
+IDE：Pycharm 2018.2.2(Community Edition),AWS Cloud9
 
 # ■ユースケース
 ![2](https://user-images.githubusercontent.com/40058717/45882444-29232980-bde9-11e8-81b6-405812823c00.png)
