@@ -16,6 +16,10 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+#####################
+# Security settings #
+#####################
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
@@ -25,8 +29,12 @@ SECRET_KEY = 'cc^9(lfy_tntc6i2-y#!ff%6vkbao*c8w(3%(dmsnyjs3=v!n3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.33.10']
+ALLOWED_HOSTS = ['*']
 
+
+#################
+# Core settings #
+#################
 
 # Application definition
 
@@ -37,9 +45,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites', # 追記箇所 Django-allauth
+    'allauth', # 追記箇所 Django-allauth
+    'allauth.account', # 追記箇所 Django-allauth
+    'allauth.socialaccount', # 追記箇所 Django-allauth
+    'accounts.apps.AccountsConfig', # 追記箇所 Django-allauth
     'bootstrap4',  # 追記箇所
     #'bootstrapform',  # django-bootstrap-form# 追記箇所
     'bookmgr',  # 追記箇所
+    # 'accounts', # 追記箇所
     'gunicorn', # 追記箇所
     'debug_toolbar', # 追記箇所
     'mycalendar', # 追記箇所
@@ -79,6 +93,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
 
+
+############
+# Database #
+############
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
@@ -101,6 +119,10 @@ DATABASES = {
 # }
 
 
+
+#######################
+# Password validation #
+#######################
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 
@@ -119,7 +141,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+########################
+# Internationalization #
+########################
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
@@ -133,19 +157,42 @@ USE_L10N = True
 
 USE_TZ = True
 
-
+################
+# Static files #
+################
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/static'
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
 
-# AUTH_USER_MODEL = 'mycalendar.User' # 追記箇所
+
+##################
+# Authentication #
+##################
+AUTH_USER_MODEL = 'accounts.CustomUser' # 追記箇所
+
+# 認証方式を「メールアドレスとパスワード」に変更
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# ユーザー名は使用しない
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
+# ユーザー登録確認メールは送信しない
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+# メールアドレスを必須項目にする
+ACCOUNT_EMAIL_REQUIRED = True
+
+SITE_ID = 1
+
 
 # LOGIN_REDIRECT_URL = '/booklist/'  # 追記箇所
 LOGIN_REDIRECT_URL = '/month_with_schedule/'  # 追記箇所
 LOGIN_URL = '/accounts/login/'  # 追記箇所
-LOGOUT_REDIRECT_URL = '/accounts/login'  # 追記箇所
+LOGOUT_REDIRECT_URL = '/accounts/login/'  # 追記箇所
+# ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 INTERNAL_IPS = ['127.0.0.1','192.168.33.10'] # 追記箇所
 
@@ -153,6 +200,18 @@ DEBUG_TOOLBAR_CONFIG = { # 追記箇所
     'SHOW_TEMPLATE_CONTEXT': True,
 }
 
+############
+# Messages #
+############
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+
+##################
+# Email settings #
+##################
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ###########
 # Logging 本番用#
