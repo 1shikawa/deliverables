@@ -178,3 +178,4 @@ mysqltest.py
 /mysite/TopTweetsFinder/
 /instant-django/
 /.rbenv/plugins/ruby-build/
+/password.py
