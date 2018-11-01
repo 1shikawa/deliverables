@@ -9,7 +9,7 @@ CSSフレームワーク：Bootstrap4 0.0.6\
 Webサーバ：Nginx 1.14.0\
 APサーバ：Gunicorn 19.9.0\
 DBサーバ：MariaDB 10.0.36\
-IDE：Pycharm 2018.2.2(Community Edition),AWS Cloud9
+IDE：Pycharm 2018.2.2(Community Edition),AWS Cloud9\
 その他：VirtualBox,Vagrant
 
 # ■ユースケース

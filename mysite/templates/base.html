@@ -25,6 +25,7 @@
 
 
 
+
 </style>
 
 <body>
@@ -61,8 +62,11 @@
             <li class="nav-item active">
                 <a class="nav-link" href="{% url 'TopTweetsFinder:TwitterFinderIndex' %}">index</a>
             </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'mycalendar:SumExport' %}">SumExport</a>
+            </li>
         </ul>
-        <span style="color:white;" class="navbar-text navbar-right">ログイン中：{{ user.get_username }}</span>
+        <span style="color:white;" class="navbar-text navbar-right">ログイン中：{{ user.departments }}</span>
         {% endif %}
     </div>
 </nav>

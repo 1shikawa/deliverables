@@ -91,7 +91,7 @@ class MonthWithScheduleMixin(MonthCalendarMixin):
             week_list = []
             for day in week:
                 lookup = {self.date_field: day}
-                queryset = self.model.objects.filter(**lookup).filter(register=self.request.user)
+                queryset = self.model.objects.filter(**lookup).filter(register=str(self.request.user).split('@')[0])
                 if self.order_field:
                     queryset = queryset.order_by(self.order_field)
                 week_list.append(

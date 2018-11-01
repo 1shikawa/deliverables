@@ -62,6 +62,11 @@ urlpatterns = [
         'Chart/', views.Chart.as_view(), name='Chart'
     ),
 
+    # CSVエクスポート
+    path(
+        'SumExport/', views.SumExport, name='SumExport'
+    ),
+
     # ログアウト
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
 

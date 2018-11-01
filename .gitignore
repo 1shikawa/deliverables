@@ -179,3 +179,4 @@ mysqltest.py
 /instant-django/
 /.rbenv/plugins/ruby-build/
 /password.py
+/pw.py

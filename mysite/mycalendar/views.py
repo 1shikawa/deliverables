@@ -1,4 +1,5 @@
 import logging
+import csv
 import datetime
 from django.contrib.auth.views import (
     LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
@@ -8,6 +9,7 @@ from django.utils.decorators import method_decorator  # @method_decoratorに使�
 from django.contrib.auth.decorators import login_required  # @method_decoratorに使用
 from django.contrib import messages  # メッセージフレームワーク
 from django.shortcuts import redirect
+from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views import generic
 from mycalendar.models import Schedule, LargeItem
@@ -93,9 +95,9 @@ class NewMultiAdd(MonthCalendarMixin, generic.FormView):
         context['indate'] = indate
         context['month'] = self.get_month_calendar()
         context['LargeItem'] = LargeItem.objects.all()
-        context['registered'] = Schedule.objects.filter(date=date).filter(register=str(self.request.user))
+        context['registered'] = Schedule.objects.filter(date=date).filter(register=str(self.request.user).split('@')[0])
         try:
-            totalkosu = Schedule.objects.filter(date=date).filter(register=str(self.request.user)).first()
+            totalkosu = Schedule.objects.filter(date=date).filter(register=str(self.request.user).split('@')[0]).first()
             context['totalkosu'] = totalkosu
         except:
             context['totalkosu'] = 0
@@ -129,16 +131,16 @@ class NewMultiAdd(MonthCalendarMixin, generic.FormView):
         instances = form.save(commit=False)
         # 新たに作成されたscheduleと更新されたscheduleを取り出して、新規作成or更新処理
         for schedule in instances:
-            schedule.register = str(self.request.user)
+            schedule.register = str(self.request.user).split('@')[0]
             schedule.date = date
             schedule.save()
         # 総時間をkosuを合計してカラムに登録
         kosuBydate = Schedule.objects.filter(date=date).values('date', 'register').annotate(totalkosu=Sum('kosu'))
         for i in kosuBydate:
-            if i['register'] == str(self.request.user):
+            if i['register'] == str(self.request.user).split('@')[0]:
                 total = i['totalkosu']
 
-        for row in Schedule.objects.filter(date=date).filter(register=str(self.request.user)):
+        for row in Schedule.objects.filter(date=date).filter(register=str(self.request.user).split('@')[0]):
             row.totalkosu = int(total)
             row.save()
 
@@ -174,24 +176,23 @@ class NewMultiEdit(MonthCalendarMixin, generic.FormView):
         if month and year and day:
             date = str(year) + '-' + str(month) + '-' + str(day)
         return BS4ScheduleEditFormSet(self.request.POST or None,
-                                      queryset=Schedule.objects.filter(date=date, register=self.request.user))
-        # ,register=self.request.user))
+                                      queryset=Schedule.objects.filter(date=date, register=str(self.request.user).split('@')[0]))
 
-    # def form_valid(self, form):
-    #     month = self.kwargs.get('month')
-    #     year = self.kwargs.get('year')
-    #     day = self.kwargs.get('day')
-    #     if month and year and day:
-    #         date = datetime.date(year=int(year), month=int(month), day=int(day))
-    #     else:
-    #         date = datetime.date.today()
-    #     for fm in form:
-    #         schedule = fm.save(commit=False)
-    #         # schedule.register = self.request.user
-    #         schedule.date = date
-    #         schedule.save()
-    #     return redirect('mycalendar:month_with_schedule', year=date.year, month=date.month, day=date.day)
-    # return super().form_valid(form)
+        # def form_valid(self, form):
+        #     month = self.kwargs.get('month')
+        #     year = self.kwargs.get('year')
+        #     day = self.kwargs.get('day')
+        #     if month and year and day:
+        #         date = datetime.date(year=int(year), month=int(month), day=int(day))
+        #     else:
+        #         date = datetime.date.today()
+        #     for fm in form:
+        #         schedule = fm.save(commit=False)
+        #         # schedule.register = self.request.user
+        #         schedule.date = date
+        #         schedule.save()
+        #     return redirect('mycalendar:month_with_schedule', year=date.year, month=date.month, day=date.day)
+        # return super().form_valid(form)
 
     def form_valid(self, form):
         month = self.kwargs.get('month')
@@ -211,7 +212,7 @@ class NewMultiEdit(MonthCalendarMixin, generic.FormView):
         total = 0
         # 新たに作成されたscheduleと更新されたscheduleを取り出して、新規作成or更新処理
         for schedule in instances:
-            schedule.register = str(self.request.user)
+            schedule.register = str(self.request.user).split('@')[0]
             schedule.date = date
             schedule.save()
 
@@ -220,7 +221,7 @@ class NewMultiEdit(MonthCalendarMixin, generic.FormView):
             if i['register'] == str(self.request.user):
                 total = i['totalkosu']
 
-        for row in Schedule.objects.filter(date=date).filter(register=str(self.request.user)):
+        for row in Schedule.objects.filter(date=date).filter(register=str(self.request.user).split('@')[0]):
             row.totalkosu = int(total)
             row.save()
         messages.success(self.request, date.strftime('%Y年%m月%d日') + "を更新しました。")
@@ -307,9 +308,9 @@ class DailyInputList(generic.ListView):
         before_31_days = today - datetime.timedelta(days=1) * 31
         # 当日から1ヶ月前までを取得
         context['DailyInputList'] = Schedule.objects.filter(date__range=(before_31_days, today)).filter(
-            register=str(self.request.user)).order_by('-date')
+            register=str(self.request.user).split('@')[0]).order_by('-date')
         context['InputCount'] = Schedule.objects.filter(date__range=(before_31_days, today)).filter(
-            register=str(self.request.user)).count()
+            register=str(self.request.user).split('@')[0]).count()
         context['InputCountDescription'] = '直近1ヶ月'
         keyword1 = self.request.GET.get('keyword1')
 
@@ -329,7 +330,7 @@ class DailyInputList(generic.ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(register=self.request.user)
+        return queryset.filter(register=str(self.request.user).split('@')[0])
 
 
 @method_decorator(login_required, name='dispatch')
@@ -435,3 +436,16 @@ class Chart(generic.ListView):
         context['df'] = sorted_grouped_df
         context['register'] = sorted_grouped_df['register'].drop_duplicates().reset_index()
         return context
+
+
+@method_decorator(login_required, name='dispatch')
+def SumExport(request):
+    """CSV出力ダウンロード"""
+    response = HttpResponse(content_type='text/csv',charset='utf-8-sig')
+    response['Content-Disposition'] = 'attachment; filename="SumExport.csv"'  # ファイルダウンロードを強制
+    # HttpResponseオブジェクトはファイルっぽいオブジェクトなので、csv.writerにそのまま渡せます。
+    writer = csv.writer(response)
+    writer.writerow(['id','大項目','中項目','工数','登録者'])
+    for s in Schedule.objects.all():
+        writer.writerow([s.pk, s.LargeItem, s.MiddleItem, s.kosu, s.register])
+    return response
